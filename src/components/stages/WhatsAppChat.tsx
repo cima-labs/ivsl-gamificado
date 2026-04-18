@@ -1971,7 +1971,7 @@ function TikTokFeed({ devSubStage, onComplete }: { devSubStage?: WhatsAppSubStag
           key={i}
           style={{
             position: "relative",
-            width: "100%", height: "calc(100vh - 56px)",
+            width: "100%", height: "calc(100dvh - 56px)",
             scrollSnapAlign: "start",
             scrollSnapStop: "always",
             flexShrink: 0,

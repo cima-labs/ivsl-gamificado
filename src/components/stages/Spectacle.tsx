@@ -37,13 +37,21 @@ export default function Spectacle({ onComplete, onCallEnded }: SpectacleProps) {
   const [audioProgress, setAudioProgress] = useState(0);
   const [muted, setMuted] = useState(false);
   const [speaker, setSpeaker] = useState(false);
+  const [needsTap, setNeedsTap] = useState(false);
   const audioRef = useRef<HTMLAudioElement>(null);
   const ringRef = useRef<HTMLAudioElement>(null);
   const endCallRef = useRef<HTMLAudioElement>(null);
   const loadingSfxRef = useRef<HTMLAudioElement>(null);
+  const videoRef = useRef<HTMLVideoElement>(null);
   const rafRef = useRef<number | null>(null);
   const audioCtxRef = useRef<AudioContext | null>(null);
   const gainNodeRef = useRef<GainNode | null>(null);
+
+  // Intentar autoplay del video; si falla (mobile sin gesto), mostrar overlay tap
+  useEffect(() => {
+    if (callState !== "video" || !videoRef.current) return;
+    videoRef.current.play().catch(() => setNeedsTap(true));
+  }, [callState]);
 
   // Rastrear progreso del audio con RAF cuando la llamada está activa
   useEffect(() => {
@@ -121,12 +129,22 @@ export default function Spectacle({ onComplete, onCallEnded }: SpectacleProps) {
             transition={{ duration: 0.6 }}
           >
             <video
+              ref={videoRef}
               src="/video1-ivsl-final.mp4"
-              autoPlay
               playsInline
               className="w-full h-full object-cover"
               onEnded={handleIncoming}
             />
+            {needsTap && (
+              <div
+                onClick={() => { videoRef.current?.play(); setNeedsTap(false); }}
+                style={{ position: "absolute", inset: 0, display: "flex", alignItems: "center", justifyContent: "center", background: "rgba(0,0,0,0.5)", cursor: "pointer", zIndex: 10 }}
+              >
+                <div style={{ width: 72, height: 72, borderRadius: "50%", background: "rgba(255,255,255,0.15)", border: "2px solid rgba(255,255,255,0.4)", display: "flex", alignItems: "center", justifyContent: "center" }}>
+                  <svg width="28" height="28" viewBox="0 0 24 24" fill="white"><path d="M8 5v14l11-7z"/></svg>
+                </div>
+              </div>
+            )}
             {/* Parpadeo negro */}
             <motion.div
               className="absolute inset-0"
