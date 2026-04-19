@@ -12,11 +12,8 @@ export default function Home() {
   return (
     <main className="w-full bg-black flex items-center justify-center overflow-hidden" style={{ height: "100svh" }}>
       <div
-        className="relative overflow-hidden bg-[#050505]"
-        style={{
-          height: "100svh",
-          width: "min(100vw, calc(100svh * 9 / 16))",
-        }}
+        className="relative overflow-hidden bg-[#050505] app-container"
+        style={{ width: "100%", height: "100%" }}
       >
         <IVSLExperience
           devStage={IS_DEV ? devStage : undefined}

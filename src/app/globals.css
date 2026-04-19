@@ -57,3 +57,11 @@ body {
 .gold-glow {
   box-shadow: 0 0 20px rgba(212, 175, 55, 0.15), 0 0 60px rgba(212, 175, 55, 0.05);
 }
+
+/* En desktop: caja 9:16 centrada. En mobile IAB: full-screen sin márgenes */
+@media (min-width: 500px) {
+  .app-container {
+    width: calc(100svh * 9 / 16) !important;
+    height: 100svh !important;
+  }
+}
