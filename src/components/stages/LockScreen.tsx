@@ -79,7 +79,7 @@ export default function LockScreen({ onOpen }: LockScreenProps) {
       <div className="relative flex flex-col items-center w-full h-full" style={{ zIndex: 2 }}>
 
         {/* Status bar iOS 26 */}
-        <div className="w-full flex justify-between items-center px-6" style={{ paddingTop: "calc(env(safe-area-inset-top) + 10px)" }}>
+        <div className="w-full flex justify-between items-center" style={{ paddingTop: "calc(env(safe-area-inset-top) + 10px)", paddingLeft: 20, paddingRight: 20 }}>
           <span style={{
             fontSize: 15,
             fontWeight: 600,

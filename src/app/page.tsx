@@ -10,10 +10,13 @@ export default function Home() {
   const currentIdx = STAGE_ORDER.indexOf(devStage);
 
   return (
-    <main style={{ width: "100%", height: "100svh", background: "#050505", overflow: "hidden", position: "relative" }}>
+    <main className="w-full bg-black flex items-center justify-center overflow-hidden" style={{ height: "100svh" }}>
       <div
-        className="relative overflow-hidden"
-        style={{ width: "100%", height: "100%", background: "#050505" }}
+        className="relative overflow-hidden bg-[#050505]"
+        style={{
+          height: "100svh",
+          width: "min(100vw, calc(100svh * 9 / 16))",
+        }}
       >
         <IVSLExperience
           devStage={IS_DEV ? devStage : undefined}
