@@ -154,10 +154,9 @@ interface AudioNoteProps {
   timeStr: string;
   onPlayStart: () => void;
   onAudioEnded: () => void;
-  darkRef: React.RefObject<HTMLVideoElement | null>;
 }
 
-function AudioNote({ timeStr, onPlayStart, onAudioEnded, darkRef }: AudioNoteProps) {
+function AudioNote({ timeStr, onPlayStart, onAudioEnded }: AudioNoteProps) {
   const [playing, setPlaying] = useState(false);
   const [finished, setFinished] = useState(false);
   const [progress, setProgress] = useState(0);
@@ -178,12 +177,6 @@ function AudioNote({ timeStr, onPlayStart, onAudioEnded, darkRef }: AudioNotePro
     tapRef.current?.play().catch(() => {});
     setPlaying(true);
     onPlayStart();
-    // Arranca dark.mp4 como música de fondo a volumen bajo
-    if (darkRef.current) {
-      darkRef.current.volume = 0.08;
-      darkRef.current.currentTime = 0;
-      darkRef.current.play().catch(() => {});
-    }
     setTimeout(() => {
       audioRef.current?.play().catch(() => {});
     }, 100);
@@ -200,11 +193,6 @@ function AudioNote({ timeStr, onPlayStart, onAudioEnded, darkRef }: AudioNotePro
     setPlaying(false);
     setFinished(true);
     setProgress(1);
-    // Para la música
-    if (darkRef.current) {
-      darkRef.current.pause();
-      darkRef.current.currentTime = 0;
-    }
     setTimeout(() => onAudioEnded(), 600);
   }
 
@@ -579,7 +567,6 @@ export default function WhatsAppChat({ devSubStage, onComplete }: { devSubStage?
   const [showCall, setShowCall] = useState(() => devSubStage === "call-screen");
   const [showTikTok, setShowTikTok] = useState(() => devSubStage === "tiktok-login" || devSubStage === "tiktok-feed" || devSubStage === "aurelius-chat" || devSubStage === "video-call");
   const [showFeed, setShowFeed] = useState(() => devSubStage === "tiktok-feed" || devSubStage === "aurelius-chat" || devSubStage === "video-call");
-  const darkRef = useRef<HTMLVideoElement>(null);
 
   const now = new Date();
   const timeStr = `${now.getHours().toString().padStart(2,"0")}:${now.getMinutes().toString().padStart(2,"0")}`;
@@ -605,13 +592,11 @@ export default function WhatsAppChat({ devSubStage, onComplete }: { devSubStage?
       exit={{ x: "100%" }}
       transition={{ duration: 0.32, ease: [0.25, 1, 0.5, 1] }}
     >
-      {/* Música de fondo (dark.mp4) — oculta */}
-      <video ref={darkRef} src="/dark.mp4" muted={false} loop style={{ display: "none" }} />
 
       {/* ── HEADER ── */}
       <div style={{
         background: "#1F2C34",
-        paddingTop: 14, paddingBottom: 10,
+        paddingTop: "calc(env(safe-area-inset-top) + 14px)", paddingBottom: 10,
         paddingLeft: 14, paddingRight: 14,
         display: "flex", alignItems: "center", gap: 10,
         flexShrink: 0, zIndex: 2,
@@ -731,7 +716,6 @@ export default function WhatsAppChat({ devSubStage, onComplete }: { devSubStage?
                 timeStr={timeStr}
                 onPlayStart={() => setRecordingIdx(null)}
                 onAudioEnded={handleAudioEnded}
-                darkRef={darkRef}
               />
             )}
           </AnimatePresence>
@@ -784,6 +768,7 @@ function TikTokLogin({ onLogin }: { onLogin: () => void }) {
         display: "flex", flexDirection: "column",
         fontFamily: "var(--font-montserrat)",
         overflowY: "auto",
+        WebkitOverflowScrolling: "touch" as const,
       }}
       initial={{ opacity: 0, y: 40 }}
       animate={{ opacity: 1, y: 0 }}
@@ -792,10 +777,10 @@ function TikTokLogin({ onLogin }: { onLogin: () => void }) {
     >
       <audio ref={tapRef} src="/sounds/tap boton.mp3" />
       {/* Status bar placeholder */}
-      <div style={{ height: 44, flexShrink: 0 }} />
+      <div style={{ height: "calc(env(safe-area-inset-top) + 16px)", flexShrink: 0 }} />
 
 
-      <div style={{ flex: 1, display: "flex", flexDirection: "column", padding: "0 24px 40px" }}>
+      <div style={{ flex: 1, display: "flex", flexDirection: "column", padding: "0 24px", paddingBottom: "calc(env(safe-area-inset-bottom) + 40px)" }}>
 
         {/* Logo TikTok */}
         <div style={{ display: "flex", justifyContent: "center", marginBottom: 28 }}>
@@ -895,10 +880,10 @@ function TikTokLogin({ onLogin }: { onLogin: () => void }) {
 
         {/* Opciones sociales */}
         <div style={{ display: "flex", justifyContent: "center", gap: 20 }}>
+          {/* Google y Facebook */}
           {[
             { icon: "G", color: "#fff", bg: "#1a1a1a", label: "Google" },
             { icon: "f", color: "#1877F2", bg: "#1a1a1a", label: "Facebook" },
-            { icon: "🍎", color: "#fff", bg: "#1a1a1a", label: "Apple" },
           ].map(({ icon, color, bg, label }) => (
             <div key={label} style={{ display: "flex", flexDirection: "column", alignItems: "center", gap: 6, cursor: "pointer" }}>
               <div style={{ width: 52, height: 52, borderRadius: "50%", background: bg, border: "1px solid #2a2a2a", display: "flex", alignItems: "center", justifyContent: "center" }}>
@@ -907,6 +892,15 @@ function TikTokLogin({ onLogin }: { onLogin: () => void }) {
               <span style={{ color: "#555", fontSize: 11 }}>{label}</span>
             </div>
           ))}
+          {/* Apple — SVG para compatibilidad IAB */}
+          <div style={{ display: "flex", flexDirection: "column", alignItems: "center", gap: 6, cursor: "pointer" }}>
+            <div style={{ width: 52, height: 52, borderRadius: "50%", background: "#1a1a1a", border: "1px solid #2a2a2a", display: "flex", alignItems: "center", justifyContent: "center" }}>
+              <svg width="20" height="20" viewBox="0 0 24 24" fill="#fff">
+                <path d="M18.71 19.5c-.83 1.24-1.71 2.45-3.05 2.47-1.34.03-1.77-.79-3.29-.79-1.53 0-2 .77-3.27.82-1.31.05-2.3-1.32-3.14-2.53C4.25 17 2.94 12.45 4.7 9.39c.87-1.52 2.43-2.48 4.12-2.51 1.28-.02 2.5.87 3.29.87.78 0 2.26-1.07 3.8-.91.65.03 2.47.26 3.64 1.98-.09.06-2.17 1.28-2.15 3.81.03 3.02 2.65 4.03 2.68 4.04-.03.07-.42 1.44-1.38 2.83M13 3.5c.73-.83 1.94-1.46 2.94-1.5.13 1.17-.34 2.35-1.04 3.19-.69.85-1.83 1.51-2.95 1.42-.15-1.15.41-2.35 1.05-3.11z"/>
+              </svg>
+            </div>
+            <span style={{ color: "#555", fontSize: 11 }}>Apple</span>
+          </div>
         </div>
 
         {/* Footer */}
@@ -978,6 +972,7 @@ function AureliusChat({ devSubStage, onComplete }: { devSubStage?: WhatsAppSubSt
   const camStreamRef = useRef<MediaStream | null>(null);
   const bottomRef = useRef<HTMLDivElement>(null);
   const waitRef = useRef<HTMLAudioElement | null>(null);
+  const riseLandingRef = useRef<HTMLAudioElement>(null);
   const callVideoRef = useRef<HTMLVideoElement | null>(null);
   const glitchCanvasRef = useRef<HTMLCanvasElement | null>(null);
   const glitchRafRef = useRef<number | null>(null);
@@ -1216,10 +1211,11 @@ function AureliusChat({ devSubStage, onComplete }: { devSubStage?: WhatsAppSubSt
         fontFamily: "var(--font-montserrat)",
       }}
     >
+      <audio ref={riseLandingRef} src="/sounds/rise landing.mp3" preload="auto" />
       {/* Header WhatsApp — igual que chat analista */}
       <div style={{
         background: "#1F2C34",
-        paddingTop: 14, paddingBottom: 10,
+        paddingTop: "calc(env(safe-area-inset-top) + 14px)", paddingBottom: 10,
         paddingLeft: 14, paddingRight: 14,
         display: "flex", alignItems: "center", gap: 10,
         flexShrink: 0, zIndex: 3, position: "relative",
@@ -1624,7 +1620,7 @@ function AureliusChat({ devSubStage, onComplete }: { devSubStage?: WhatsAppSubSt
                   }}
                   whileHover={{ scale: 1.025, boxShadow: "0 6px 50px rgba(212,175,55,0.65)" }}
                   whileTap={{ scale: 0.97 }}
-                  onClick={() => { new Audio("/sounds/rise landing.mp3").play().catch(() => {}); onComplete?.(); }}
+                  onClick={() => { riseLandingRef.current?.play().catch(() => {}); onComplete?.(); }}
                   style={{
                     background: "linear-gradient(135deg, #D4AF37 0%, #F5D76E 50%, #D4AF37 100%)",
                     border: "none",
@@ -1938,7 +1934,7 @@ function TikTokFeed({ devSubStage, onComplete }: { devSubStage?: WhatsAppSubStag
       <div style={{
         position: "absolute", top: 0, left: 0, right: 0, zIndex: 30,
         display: "flex", alignItems: "center", justifyContent: "center",
-        paddingTop: 44, paddingBottom: 8,
+        paddingTop: "calc(env(safe-area-inset-top) + 24px)", paddingBottom: 8,
         background: "linear-gradient(to bottom, rgba(0,0,0,0.6) 0%, transparent 100%)",
         pointerEvents: "none",
       }}>
@@ -1951,7 +1947,7 @@ function TikTokFeed({ devSubStage, onComplete }: { devSubStage?: WhatsAppSubStag
           <span style={{ color: "rgba(255,255,255,0.55)", fontSize: 16, fontWeight: 600, fontFamily: "var(--font-montserrat)" }}>Explora</span>
         </div>
         {/* Search icon */}
-        <div style={{ position: "absolute", right: 16, top: 44 }}>
+        <div style={{ position: "absolute", right: 16, top: "calc(env(safe-area-inset-top) + 24px)" }}>
           <svg width="24" height="24" viewBox="0 0 24 24" fill="white">
             <path d="M15.5 14h-.79l-.28-.27A6.47 6.47 0 0 0 16 9.5 6.5 6.5 0 1 0 9.5 16c1.61 0 3.09-.59 4.23-1.57l.27.28v.79l5 4.99L20.49 19l-4.99-5zm-6 0C7.01 14 5 11.99 5 9.5S7.01 5 9.5 5 14 7.01 14 9.5 11.99 14 9.5 14z"/>
           </svg>
@@ -1995,7 +1991,7 @@ function TikTokFeed({ devSubStage, onComplete }: { devSubStage?: WhatsAppSubStag
                 setTimeout(() => {
                   new Audio("/sounds/tap mensaje.mp3").play().catch(() => {});
                   setShowNotif(true);
-                }, 800);
+                }, 200);
               }
             }}
           />

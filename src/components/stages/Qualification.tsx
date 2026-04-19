@@ -6,6 +6,7 @@ import { motion, AnimatePresence } from "framer-motion";
 interface QualificationProps {
   onComplete: () => void;
   onFilterDone?: () => void;
+  onStart?: () => void;
 }
 
 interface Question {
@@ -67,7 +68,7 @@ function Typewriter({ text, speed = 18 }: { text: string; speed?: number }) {
   return <span>{displayed}{!done && <span className="animate-pulse">▋</span>}</span>;
 }
 
-export default function Qualification({ onComplete, onFilterDone }: QualificationProps) {
+export default function Qualification({ onComplete, onFilterDone, onStart }: QualificationProps) {
   const [started, setStarted] = useState(false);
   const [currentQ, setCurrentQ] = useState(0);
   const [answers, setAnswers] = useState<("A" | "B" | null)[]>([null, null, null]);
@@ -75,6 +76,8 @@ export default function Qualification({ onComplete, onFilterDone }: Qualificatio
   const [allDone, setAllDone] = useState(false);
 
   const tapRef = useRef<HTMLAudioElement>(null);
+
+  useEffect(() => { onStart?.(); }, []);
 
   function playTap() {
     if (!tapRef.current) return;
@@ -102,7 +105,7 @@ export default function Qualification({ onComplete, onFilterDone }: Qualificatio
         onFilterDone?.();
         setTimeout(() => onComplete(), 2800);
       }
-    }, 1000);
+    }, 2000);
   }
 
   return (
@@ -137,17 +140,17 @@ export default function Qualification({ onComplete, onFilterDone }: Qualificatio
         {/* Header */}
         <div
           className="flex items-center justify-between px-5 flex-shrink-0"
-          style={{ paddingTop: "10%", paddingBottom: "4%", borderBottom: "1px solid rgba(212,175,55,0.12)" }}
+          style={{ paddingTop: "calc(env(safe-area-inset-top) + 14px)", paddingBottom: "4%", borderBottom: "1px solid rgba(212,175,55,0.12)" }}
         >
           <p
             className="text-[9px] tracking-[0.4em] uppercase"
-            style={{ fontFamily: "var(--font-montserrat)", color: "rgba(212,175,55,0.7)", fontWeight: 600 }}
+            style={{ fontFamily: "var(--font-montserrat)", color: "rgba(212,175,55,0.7)", fontWeight: 600, marginLeft: 12 }}
           >
             Cima Labs
           </p>
           <p
             className="text-[8px] tracking-[0.3em]"
-            style={{ fontFamily: "var(--font-montserrat)", color: "rgba(212,175,55,0.35)" }}
+            style={{ fontFamily: "var(--font-montserrat)", color: "rgba(212,175,55,0.35)", marginRight: 12 }}
           >
             v2.0
           </p>
@@ -200,7 +203,7 @@ export default function Qualification({ onComplete, onFilterDone }: Qualificatio
                 whileHover={{ scale: 1.025, boxShadow: "0 6px 50px rgba(212,175,55,0.65)" }}
                 whileTap={{ scale: 0.97 }}
               >
-                ▶ &nbsp; Iniciar Filtro
+                <svg width="10" height="10" viewBox="0 0 10 10" fill="currentColor" style={{ display: "inline", marginRight: 8, verticalAlign: "middle" }}><polygon points="0,0 10,5 0,10"/></svg>Iniciar Filtro
               </motion.button>
               <p
                 className="text-[7px] tracking-[0.3em] uppercase"

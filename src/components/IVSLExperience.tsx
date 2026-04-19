@@ -80,15 +80,17 @@ export default function IVSLExperience({ devStage, onStageChange }: IVSLExperien
   function stopTension() {
     const audio = tensionRef.current;
     if (!audio) return;
-    const fade = setInterval(() => {
-      if (audio.volume > 0.05) {
-        audio.volume = Math.max(0, audio.volume - 0.05);
-      } else {
-        audio.pause();
-        audio.volume = 0.55;
-        clearInterval(fade);
-      }
-    }, 80);
+    audio.volume = 0;
+    audio.pause();
+    audio.currentTime = 0;
+  }
+
+  function startTensionFresh() {
+    const audio = tensionRef.current;
+    if (!audio) return;
+    audio.currentTime = 0;
+    audio.volume = 0.55;
+    audio.play().catch(() => {});
   }
 
   const whatsappSubStage = WHATSAPP_SUBSTAGES[stage];
@@ -102,10 +104,10 @@ export default function IVSLExperience({ devStage, onStageChange }: IVSLExperien
           <WaitingRoom key="waiting" onEnter={() => setStage("spectacle")} />
         )}
         {stage === "spectacle" && (
-          <Spectacle key="spectacle" onCallEnded={startTension} onComplete={() => setStage("qualification")} />
+          <Spectacle key="spectacle" onComplete={() => setStage("qualification")} />
         )}
         {stage === "qualification" && (
-          <Qualification key="qualification" onFilterDone={stopTension} onComplete={() => setStage("scanning")} />
+          <Qualification key="qualification" onStart={startTensionFresh} onFilterDone={stopTension} onComplete={() => setStage("scanning")} />
         )}
         {stage === "scanning" && (
           <Scanning key="scanning" onComplete={() => setStage("diagnosis")} />

@@ -1019,7 +1019,7 @@ export default function LandingPage() {
       <div style={{
         ...s.section,
         background: "radial-gradient(ellipse at 50% 60%, rgba(212,175,55,0.05) 0%, transparent 60%)",
-        paddingBottom: 64,
+        paddingBottom: "calc(env(safe-area-inset-bottom) + 64px)",
       }}>
         <motion.div {...fadeUp} style={{ display: "flex", flexDirection: "column", alignItems: "center", gap: 16, width: "100%", textAlign: "center" }}>
           <h2 style={{

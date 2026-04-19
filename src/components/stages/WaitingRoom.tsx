@@ -101,16 +101,23 @@ export default function WaitingRoom({ onEnter }: WaitingRoomProps) {
         animate={{ opacity: 1 }}
         transition={{ delay: 1.2, duration: 1, ease: "easeInOut" }}
       >
-        <h1
-          className="gold-text leading-snug"
+        <motion.h1
+          className="leading-snug"
+          animate={{ backgroundPosition: ["-200% center", "200% center"] }}
+          transition={{ duration: 3, repeat: Infinity, repeatDelay: 1.5, ease: "linear" }}
           style={{
             fontFamily: "var(--font-playfair)",
             fontSize: "clamp(1.4rem, 7vw, 1.8rem)",
             fontWeight: 600,
+            background: "linear-gradient(90deg, #AA771C 0%, #BF953F 15%, #AA771C 30%, #D4AF37 40%, #FCF6BA 48%, #FFFEF0 50%, #FCF6BA 52%, #D4AF37 60%, #AA771C 70%, #BF953F 85%, #AA771C 100%)",
+            backgroundSize: "300% 100%",
+            WebkitBackgroundClip: "text",
+            WebkitTextFillColor: "transparent",
+            backgroundClip: "text",
           }}
         >
           Has sido seleccionado.
-        </h1>
+        </motion.h1>
         <p
           className="text-[11px] leading-relaxed tracking-widest uppercase"
           style={{
@@ -213,7 +220,8 @@ export default function WaitingRoom({ onEnter }: WaitingRoomProps) {
 
       {/* Línea decorativa inferior */}
       <motion.div
-        className="absolute bottom-10 flex flex-col items-center gap-2"
+        className="absolute flex flex-col items-center gap-2"
+        style={{ bottom: "calc(env(safe-area-inset-bottom) + 40px)" }}
         initial={{ opacity: 0 }}
         animate={{ opacity: 1 }}
         transition={{ delay: 2.2, duration: 1 }}

@@ -53,23 +53,15 @@ export default function Spectacle({ onComplete, onCallEnded }: SpectacleProps) {
     videoRef.current.play().catch(() => setNeedsTap(true));
   }, [callState]);
 
-  // Rastrear progreso del audio con RAF cuando la llamada está activa
-  useEffect(() => {
-    if (callState !== "active") return;
-    function tick() {
-      const a = audioRef.current;
-      if (a && a.duration) {
-        setAudioProgress(a.currentTime / a.duration);
-      }
-      rafRef.current = requestAnimationFrame(tick);
+  function handleTimeUpdate() {
+    const a = audioRef.current;
+    if (a && a.duration && !isNaN(a.duration) && a.duration > 0) {
+      setAudioProgress(a.currentTime / a.duration);
     }
-    rafRef.current = requestAnimationFrame(tick);
-    return () => { if (rafRef.current) cancelAnimationFrame(rafRef.current); };
-  }, [callState]);
+  }
 
   // Al terminar el audio → animación de llamada finalizada → siguiente etapa
   function handleAudioEnded() {
-    if (rafRef.current) cancelAnimationFrame(rafRef.current);
     setAudioProgress(1);
     setCallState("ended");
     onCallEnded?.();
@@ -90,6 +82,10 @@ export default function Spectacle({ onComplete, onCallEnded }: SpectacleProps) {
     ringRef.current?.pause();
     if (ringRef.current) ringRef.current.currentTime = 0;
     setCallState("active");
+    // Desbloquear AudioContext en iOS (Instagram IAB)
+    if (audioCtxRef.current?.state === "suspended") {
+      audioCtxRef.current.resume().catch(() => {});
+    }
     audioRef.current?.play().catch(() => {});
   }
 
@@ -111,6 +107,8 @@ export default function Spectacle({ onComplete, onCallEnded }: SpectacleProps) {
       <audio
         ref={audioRef}
         src="/sounds/audio-llamada-final.mp3"
+        preload="auto"
+        onTimeUpdate={handleTimeUpdate}
         onEnded={handleAudioEnded}
       />
       <audio ref={endCallRef} src="/sounds/end call.mp3" />
@@ -248,7 +246,7 @@ export default function Spectacle({ onComplete, onCallEnded }: SpectacleProps) {
 
             {/* Botón contestar */}
             <motion.div
-              style={{ position: "relative", zIndex: 2, display: "flex", justifyContent: "center", paddingBottom: 52 }}
+              style={{ position: "relative", zIndex: 2, display: "flex", justifyContent: "center", paddingBottom: "calc(env(safe-area-inset-bottom) + 52px)" }}
               initial={{ opacity: 0, y: 24 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ delay: 0.5, duration: 0.6, ease: [0.23,1,0.32,1] }}
@@ -391,7 +389,7 @@ export default function Spectacle({ onComplete, onCallEnded }: SpectacleProps) {
 
             {/* Botones de acción */}
             <div style={{
-              width: "100%", paddingBottom: 52, paddingLeft: 32, paddingRight: 32,
+              width: "100%", paddingBottom: "calc(env(safe-area-inset-bottom) + 52px)", paddingLeft: 32, paddingRight: 32,
               display: "flex", justifyContent: "space-between", alignItems: "center",
               zIndex: 1,
             }}>

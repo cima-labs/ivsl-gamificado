@@ -79,7 +79,7 @@ export default function LockScreen({ onOpen }: LockScreenProps) {
       <div className="relative flex flex-col items-center w-full h-full" style={{ zIndex: 2 }}>
 
         {/* Status bar iOS 26 */}
-        <div className="w-full flex justify-between items-center px-6 pt-3">
+        <div className="w-full flex justify-between items-center px-6" style={{ paddingTop: "calc(env(safe-area-inset-top) + 10px)" }}>
           <span style={{
             fontSize: 15,
             fontWeight: 600,
@@ -165,7 +165,7 @@ export default function LockScreen({ onOpen }: LockScreenProps) {
         </motion.div>
 
         {/* Notificación WhatsApp — liquid glass iOS 26 */}
-        <div className="w-full px-4" style={{ marginTop: "30vh" }}>
+        <div className="w-full px-4" style={{ marginTop: "30svh" }}>
           <AnimatePresence>
             {notifVisible && (
               <motion.div

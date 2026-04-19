@@ -10,15 +10,10 @@ export default function Home() {
   const currentIdx = STAGE_ORDER.indexOf(devStage);
 
   return (
-    <main className="w-full h-screen bg-black flex items-center justify-center">
-      {/* Contenedor 9:16 — ocupa el alto completo de la pantalla, ancho calculado */}
+    <main style={{ width: "100%", height: "100svh", background: "#050505", overflow: "hidden", position: "relative" }}>
       <div
-        className="relative overflow-hidden bg-black"
-        style={{
-          aspectRatio: "9 / 16",
-          height: "100svh",
-          maxWidth: "100vw",
-        }}
+        className="relative overflow-hidden"
+        style={{ width: "100%", height: "100%", background: "#050505" }}
       >
         <IVSLExperience
           devStage={IS_DEV ? devStage : undefined}
